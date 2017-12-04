@@ -2022,6 +2022,13 @@ class OssClient
                 $data = $this->auth($options);
             }
         }
+        // 主动关闭文件描述符，持久任务描述符资源无法释放
+        if (isset($options[self::OSS_FILE_UPLOAD])) {
+            // if input is resource, closed by client self
+            if (!is_resource($options[self::OSS_FILE_UPLOAD])) {
+                $request->__destruct();
+            }
+        }
         
         $this->redirects = 0;
         return $data;
